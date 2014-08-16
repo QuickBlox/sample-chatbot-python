@@ -6,7 +6,7 @@ Typical use cases include testing, moderation, customer support, trivia/quiz gam
 
 How to start
 start the bot by running the shell command:
-<pre><FULL PATH>/testbot.py -d -j <user JID> -r <room JID> -n <QB user ID> -p <QB user PASSWORD></pre>
+<pre><FULL PATH>/testbot.py -d -j [user JID] -r [room JID] -n [QB user ID] -p [QB user PASSWORD]</pre>
 
 Note:
 for MUC auto-join to work, you need to update the QB credentials in testbot.py and also make it executable (shell: chmod -x testbot.py).
