@@ -104,7 +104,6 @@ class MUCBot(sleekxmpp.ClientXMPP):
                                         # password=the_room_password,
                                         wait=True)
 
-
     def message(self, msg):
         """
         1:1 CHATS
@@ -122,7 +121,9 @@ class MUCBot(sleekxmpp.ClientXMPP):
             y = BeautifulSoup(str(msg))
             roomToJoin = y.xmpp_room_jid.string
             print ("Got an invite to join room")
-            os.system(selfPath + " -d -j " + qbChatLogin + " -r " + str(roomToJoin) + " -n " + qbChatNick + " -p " + qbUserPass)
+            """os.system(selfPath + " -d -j " + qbChatLogin + " -r " + str(roomToJoin) + " -n " + qbChatNick + " -p " + qbUserPass)"""
+            subprocess.call(selfPath + " -d -j " + qbChatLogin + " -r " + str(roomToJoin) + " -n " + qbChatNick + " -p " + qbUserPass, shell=True)
+
             self.send_message(mto=msg['from'].bare,
                           mbody="Thank you for your kind invitation, joining your new room now!",
                           mtype='groupchat')
