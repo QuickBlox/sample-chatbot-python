@@ -254,7 +254,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=opts.loglevel,
                         format='%(levelname)-8s %(message)s')
 
- if jid is None and opts.jid is None:
+    if jid is None and opts.jid is None:
         jid = raw_input("Username: ")
     if password is None and opts.password is None:
         password = getpass.getpass("Password: ")
