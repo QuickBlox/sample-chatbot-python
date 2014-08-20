@@ -22,7 +22,7 @@ import sleekxmpp
    Also make sure you made this script executable (chmod -x testbot.py).
 """
 
-selfPath = "/Volumes/Work/projects/comms/chatbot/testbot.py"
+selfPath = os.path.realpath(__file__)
 qbAppID = "7232"
 qbUserID = "1265350"
 qbUserPass = "niichavo"
@@ -106,9 +106,17 @@ class MUCBot(sleekxmpp.ClientXMPP):
 
     def message(self, msg):
         """
-        1:1 CHATS
-            
-        In this section we handle private (1:1) chat messages received by our bot. These may include system messages such as MUC invitations.
+        [ 1:1 CHATS. In this section we handle private (1:1) chat messages received by our bot. These may include system messages such as MUC invitations. ]
+        """
+        
+        """
+        1:1 message test auto-reply
+        Uncomment the code lines below to make chat bot reply to any incoming 1:1 chat messages by quoting them
+        """
+        
+        """
+        if msg['type'] in ('chat', 'normal'):
+            msg.reply("Thanks for sending\n%(body)s" % msg).send()
         """
         
         """
@@ -132,9 +140,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
 
     def muc_message(self, msg):
         """
-        MUC CHATS
-            
-        In this section we handle messages from MUC (multi-user chat rooms) our bot participates in.
+        [ MUC CHATS. In this section we handle messages from MUC (multi-user chat rooms) our bot participates in. ]
         """
         
         """
