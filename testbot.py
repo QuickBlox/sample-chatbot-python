@@ -16,6 +16,7 @@ import getpass
 import os
 from optparse import OptionParser
 import sleekxmpp
+import subprocess
 
 """
    IMPORTANT: for MUC auto-join to work, change these to your own script path and QuickBlox credentials.
@@ -28,6 +29,10 @@ qbUserID = "1265350"
 qbUserPass = "niichavo"
 qbChatLogin = qbUserID + "-" + qbAppID + "@chat.quickblox.com"
 qbChatNick = qbUserID
+
+jid = qbChatLogin
+password = qbUserPass
+nick = qbChatNick
 
 counter = 0
 
@@ -124,7 +129,8 @@ class MUCBot(sleekxmpp.ClientXMPP):
         Let's listen for any MUC invites and join the corresponding MUC rooms once invited.
         """
         
-        if msg['mucnick'] != self.nick and "created a group" in msg['body']:
+        """if msg['mucnick'] != self.nick and "created a group" in msg['body']:"""
+        if msg['mucnick'] != self.nick and "Create new chat" in msg['body']:
             from bs4 import BeautifulSoup
             y = BeautifulSoup(str(msg))
             roomToJoin = y.xmpp_room_jid.string
@@ -248,19 +254,19 @@ if __name__ == '__main__':
     logging.basicConfig(level=opts.loglevel,
                         format='%(levelname)-8s %(message)s')
 
-    if opts.jid is None:
-        opts.jid = raw_input("Username: ")
-    if opts.password is None:
-        opts.password = getpass.getpass("Password: ")
+ if jid is None and opts.jid is None:
+        jid = raw_input("Username: ")
+    if password is None and opts.password is None:
+        password = getpass.getpass("Password: ")
     if opts.room is None:
         opts.room = raw_input("MUC room: ")
-    if opts.nick is None:
-        opts.nick = raw_input("MUC nickname: ")
+    if nick is None and opts.nick is None:
+        nick = raw_input("MUC nickname: ")
 
     # Setup the MUCBot and register plugins. Note that while plugins may
     # have interdependencies, the order in which you register them does
     # not matter.
-    xmpp = MUCBot(opts.jid, opts.password, opts.room, opts.nick)
+    xmpp = MUCBot(jid, password, opts.room, nick)
     xmpp.register_plugin('xep_0030') # Service Discovery
     xmpp.register_plugin('xep_0045') # Multi-User Chat
     xmpp.register_plugin('xep_0199') # XMPP Ping
