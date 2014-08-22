@@ -136,8 +136,11 @@ class MUCBot(sleekxmpp.ClientXMPP):
             roomToJoin = y.xmpp_room_jid.string
             print ("Got an invite to join room")
             """os.system(selfPath + " -d -j " + qbChatLogin + " -r " + str(roomToJoin) + " -n " + qbChatNick + " -p " + qbUserPass)"""
-            subprocess.call(selfPath + " -d -j " + qbChatLogin + " -r " + str(roomToJoin) + " -n " + qbChatNick + " -p " + qbUserPass, shell=True)
-
+            """subprocess.call(selfPath + " -d -j " + qbChatLogin + " -r " + str(roomToJoin) + " -n " + qbChatNick + " -p " + qbUserPass, shell=True)"""
+            botId = subprocess.Popen([selfPath + " -d -j " + qbChatLogin + " -r " + str(roomToJoin) + " -n " + qbChatNick + " -p " + qbUserPass], shell=True)
+            print "spawned new bot ID="
+            print botId
+    
             self.send_message(mto=msg['from'].bare,
                           mbody="Thank you for your kind invitation, joining your new room now!",
                           mtype='groupchat')
