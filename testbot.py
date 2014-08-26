@@ -16,6 +16,7 @@ import getpass
 import os
 from optparse import OptionParser
 import sleekxmpp
+from sleekxmpp.xmlstream import ET
 import subprocess
 
 """
@@ -27,6 +28,7 @@ selfPath = os.path.realpath(__file__)
 qbAppID = "7232"
 qbUserID = "1265350"
 qbUserPass = "niichavo"
+
 qbChatLogin = qbUserID + "-" + qbAppID + "@chat.quickblox.com"
 qbChatNick = qbUserID
 
@@ -105,6 +107,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
         self.send_presence()
         self.plugin['xep_0045'].joinMUC(self.room,
                                         self.nick,
+                                        maxhistory="1",
                                         # If a room password is needed, use:
                                         # password=the_room_password,
                                         wait=True)
@@ -176,11 +179,31 @@ class MUCBot(sleekxmpp.ClientXMPP):
                    how it may be used.
         """
 
+
+        # Ignore messages from offline storage, track only real time messages
+        #
+        delay_element  = msg.xml.find('{urn:xmpp:delay}delay')
+        if delay_element is not None:
+            return
+
         if msg['mucnick'] != self.nick and self.nick in msg['body']:
-            self.send_message(mto=msg['from'].bare,
+            replay_message = self.make_message(mto=msg['from'].bare,
                       mbody="I heard that, %s." % msg['mucnick'],
                       mtype='groupchat')
 
+            # add 'dialog_id'
+            #
+            dialog_id_in = msg.xml.find('{jabber:client}extraParams/{jabber:client}dialog_id')
+            if dialog_id_in is not None:
+                extra_params_out = ET.Element('{jabber:client}extraParams')
+                dialog_id_out = ET.Element('{}dialog_id')
+                dialog_id_out.text = dialog_id_in.text
+                extra_params_out.append(dialog_id_out)
+                replay_message.append(extra_params_out)
+
+            replay_message.send()
+
+            print "Sent replay: " + str(replay_message)
 
         """
         Reply to anyone's test message (any message containing "test" in it)
@@ -257,14 +280,28 @@ if __name__ == '__main__':
     logging.basicConfig(level=opts.loglevel,
                         format='%(levelname)-8s %(message)s')
 
-    if jid is None and opts.jid is None:
+    if opts.jid is not None:
+        jid = opts.jid
+    if jid is None:
         jid = raw_input("Username: ")
-    if password is None and opts.password is None:
+
+    if opts.password is not None:
+        password = opts.password
+    if password is None:
         password = getpass.getpass("Password: ")
+
     if opts.room is None:
         opts.room = raw_input("MUC room: ")
-    if nick is None and opts.nick is None:
+
+    if opts.nick is not None:
+        nick = opts.nick
+    if nick is None:
         nick = raw_input("MUC nickname: ")
+
+    print "initial jid: " + jid
+    print "initial password: " + password
+    print "initial room: " + opts.room
+    print "initial nick: " + nick
 
     # Setup the MUCBot and register plugins. Note that while plugins may
     # have interdependencies, the order in which you register them does
