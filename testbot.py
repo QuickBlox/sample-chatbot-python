@@ -5,7 +5,7 @@
     TestBot: a QuickBlox compatible chat bot.
     This is a basic chat bot code that works in both 1:1 and MUC chat environments.
     Can be used for adding automated agents into QuickBlox powered apps. Typical use cases include testing, moderation, customer support, trivia/quiz games etc.
-    All custom and QuickBlox related code copyright (C) 2014 Taras Filatov and QuickBlox.
+    All custom and QuickBlox related code copyright (C) 2014 Taras Filatov, Igor Khomenko and QuickBlox.
     Based on the code from SleekXMPP project by Nathanael C. Fritz. (C) 2010.
     Distributed under Apache 2.0 open source license. See the file LICENSE for copying permission including bundled 3rd party codes.
 """
@@ -187,7 +187,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
             return
 
         if msg['mucnick'] != self.nick and self.nick in msg['body']:
-            replay_message = self.make_message(mto=msg['from'].bare,
+            reply_message = self.make_message(mto=msg['from'].bare,
                       mbody="I heard that, %s." % msg['mucnick'],
                       mtype='groupchat')
 
@@ -199,11 +199,11 @@ class MUCBot(sleekxmpp.ClientXMPP):
                 dialog_id_out = ET.Element('{}dialog_id')
                 dialog_id_out.text = dialog_id_in.text
                 extra_params_out.append(dialog_id_out)
-                replay_message.append(extra_params_out)
+                reply_message.append(extra_params_out)
 
-            replay_message.send()
+            reply_message.send()
 
-            print "Sent replay: " + str(replay_message)
+            print "Sent reply: " + str(reply_message)
 
         """
         Reply to anyone's test message (any message containing "test" in it)
