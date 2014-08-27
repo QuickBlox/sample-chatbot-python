@@ -32,9 +32,10 @@ qbUserPass = "niichavo"
 qbChatLogin = qbUserID + "-" + qbAppID + "@chat.quickblox.com"
 qbChatNick = qbUserID
 
-jid = qbChatLogin
-password = qbUserPass
-nick = qbChatNick
+user_jid = qbChatLogin
+user_password = qbUserPass
+room_jid = "7232_53baafe7535c1282fe019dda@muc.chat.quickblox.com"
+room_nick = qbChatNick
 
 counter = 0
 
@@ -250,6 +251,15 @@ class MUCBot(sleekxmpp.ClientXMPP):
 
 
 if __name__ == '__main__':
+
+    try:
+        from local_settings import *
+    except ImportError:
+        print "No custom config found, use default settings"
+    else:
+        print "Use custom settings"
+
+
     # Setup the command line arguments.
     optp = OptionParser()
 
@@ -281,32 +291,34 @@ if __name__ == '__main__':
                         format='%(levelname)-8s %(message)s')
 
     if opts.jid is not None:
-        jid = opts.jid
-    if jid is None:
-        jid = raw_input("Username: ")
+        user_jid = opts.jid
+    if user_jid is None:
+        user_jid = raw_input("Username: ")
 
     if opts.password is not None:
-        password = opts.password
-    if password is None:
-        password = getpass.getpass("Password: ")
+        user_password = opts.password
+    if user_password is None:
+        user_password = getpass.getpass("Password: ")
 
-    if opts.room is None:
-        opts.room = raw_input("MUC room: ")
+    if opts.room is not None:
+        room_jid = opts.room
+    if room_jid is None:
+        room_jid = raw_input("MUC room: ")
 
     if opts.nick is not None:
-        nick = opts.nick
-    if nick is None:
-        nick = raw_input("MUC nickname: ")
+        room_nick = opts.nick
+    if room_nick is None:
+        room_nick = raw_input("MUC nickname: ")
 
-    print "initial jid: " + jid
-    print "initial password: " + password
-    print "initial room: " + opts.room
-    print "initial nick: " + nick
+    print "initial jid: " + user_jid
+    print "initial password: " + user_password
+    print "initial room: " + room_jid
+    print "initial nick: " + room_nick
 
     # Setup the MUCBot and register plugins. Note that while plugins may
     # have interdependencies, the order in which you register them does
     # not matter.
-    xmpp = MUCBot(jid, password, opts.room, nick)
+    xmpp = MUCBot(user_jid, user_password, room_jid, room_nick)
     xmpp.register_plugin('xep_0030') # Service Discovery
     xmpp.register_plugin('xep_0045') # Multi-User Chat
     xmpp.register_plugin('xep_0199') # XMPP Ping
