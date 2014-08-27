@@ -180,13 +180,16 @@ class MUCBot(sleekxmpp.ClientXMPP):
                    how it may be used.
         """
 
-
+        #
         # Ignore messages from offline storage, track only real time messages
         #
         delay_element  = msg.xml.find('{urn:xmpp:delay}delay')
         if delay_element is not None:
             return
 
+        #
+        # Send a replay to user if he mentioned your nick
+        #
         if msg['mucnick'] != self.nick and self.nick in msg['body']:
             reply_message = self.make_message(mto=msg['from'].bare,
                       mbody="I heard that, %s." % msg['mucnick'],
@@ -194,31 +197,24 @@ class MUCBot(sleekxmpp.ClientXMPP):
 
             # add 'dialog_id'
             #
-            dialog_id_in = msg.xml.find('{jabber:client}extraParams/{jabber:client}dialog_id')
-            if dialog_id_in is not None:
-                extra_params_out = ET.Element('{jabber:client}extraParams')
-                dialog_id_out = ET.Element('{}dialog_id')
-                dialog_id_out.text = dialog_id_in.text
-                extra_params_out.append(dialog_id_out)
-                reply_message.append(extra_params_out)
+            self.copy_dialog_id(msg, reply_message)
 
             reply_message.send()
 
             print "Sent reply: " + str(reply_message)
 
-        """
-        Reply to anyone's test message (any message containing "test" in it)
-        """
-
+        #
+        # Reply to anyone's test message (any message containing "test" in it)
+        #
         if msg['mucnick'] != self.nick and "test" in msg['body']:
             self.send_message(mto=msg['from'].bare,
                       mbody="Test passed, %s." % msg['mucnick'],
                       mtype='groupchat')
 
 
-        """
-        Repeat every 3rd message in the room. Useful for testing.
-        """
+        #
+        # Repeat every 3rd message in the room. Useful for testing.
+        #
         global counter
         if msg['mucnick'] != self.nick:
             counter += 1
@@ -248,6 +244,20 @@ class MUCBot(sleekxmpp.ClientXMPP):
                               mbody="Hello, %s %s" % (presence['muc']['role'],
                                                       presence['muc']['nick']),
                               mtype='groupchat')
+
+
+    def copy_dialog_id(self, origin_message, new_message):
+        """
+        Copy a dialog_id from a received message to a replay message
+        """
+        dialog_id_in = origin_message.xml.find('{jabber:client}extraParams/{jabber:client}dialog_id')
+
+        if dialog_id_in is not None:
+            extra_params_out = ET.Element('{jabber:client}extraParams')
+            dialog_id_out = ET.Element('{}dialog_id')
+            dialog_id_out.text = dialog_id_in.text
+            extra_params_out.append(dialog_id_out)
+            new_message.append(extra_params_out)
 
 
 if __name__ == '__main__':
