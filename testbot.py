@@ -207,10 +207,18 @@ class MUCBot(sleekxmpp.ClientXMPP):
         # Reply to anyone's test message (any message containing "test" in it)
         #
         if msg['mucnick'] != self.nick and "test" in msg['body']:
-            self.send_message(mto=msg['from'].bare,
+
+            reply_test_message = self.make_message(mto=msg['from'].bare,
                       mbody="Test passed, %s." % msg['mucnick'],
                       mtype='groupchat')
 
+            # add 'dialog_id'
+            #
+            self.copy_dialog_id(msg, reply_test_message)
+
+            reply_test_message.send()
+
+            print "Sent test reply: " + str(reply_test_message)
 
         #
         # Repeat every 3rd message in the room. Useful for testing.
@@ -220,11 +228,20 @@ class MUCBot(sleekxmpp.ClientXMPP):
             counter += 1
         
         if counter == 3:
-            self.send_message(mto=msg['from'].bare,
-                              mbody="Let me repeat that: %s." % msg['body'],
-                              mtype='groupchat')
-            counter = 0
 
+            reply_repeat_message = self.make_message(mto=msg['from'].bare,
+                      mbody="Let me repeat that: %s." % msg['body'],
+                      mtype='groupchat')
+
+            # add 'dialog_id'
+            #
+            self.copy_dialog_id(msg, reply_repeat_message)
+
+            reply_repeat_message.send()
+
+            print "Sent repeat reply: " + str(reply_repeat_message)
+
+            counter = 0
 
 
     def muc_online(self, presence):
